@@ -20,6 +20,9 @@ urlpatterns = [
     path("api/v1/analytics/", views.get_analytics, name="get-analytics"),
     path("api/v1/analytics/<str:user_id>/", views.get_analytics, name="get-analytics-by-user"),
     
+    # Admin Health Monitoring (UC-04, FR-MON, NFR-AVAIL-01)
+    path("api/v1/admin/health/", views.admin_health, name="admin-health"),
+    
     # Health Check (FR-API-01)
     path("ping/", views.ping, name="ping"),
     

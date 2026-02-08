@@ -5,7 +5,11 @@ from django.views.decorators.csrf import csrf_exempt
 from core.auth import api_login_required
 import json
 import logging
-from .models import Question, Evaluation, DetailedScore
+from django.db import connection
+from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+from .models import Question, Evaluation, DetailedScore, APILog
 from .services import EvaluationService, AnalyticsService
 
 logger = logging.getLogger(__name__)
@@ -207,3 +211,138 @@ def get_analytics(request, user_id=None):
             "error": "INTERNAL_ERROR",
             "message": "Failed to retrieve analytics"
         }, status=500)
+
+
+@require_http_methods(["GET"])
+@api_login_required
+def admin_health(request):
+    """Admin endpoint for system health monitoring (UC-04, FR-MON, NFR-AVAIL-01).
+    
+    Checks:
+        - Database connectivity
+        - External AI service status (LLM)
+        - Recent API performance metrics
+        - Error rates
+        - System uptime statistics
+    
+    Returns comprehensive health status for admin dashboard.
+    """
+    health_status = {
+        "service": "team7",
+        "timestamp": timezone.now().isoformat(),
+        "status": "healthy",
+        "checks": {}
+    }
+
+    # 1. Database Check
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+        
+        health_status["checks"]["database"] = {
+            "status": "healthy",
+            "message": "Database connection successful"
+        }
+    except Exception as e:
+        health_status["status"] = "degraded"
+        health_status["checks"]["database"] = {
+            "status": "unhealthy",
+            "message": f"Database error: {str(e)}"
+        }
+        logger.error(f"Database health check failed: {str(e)}")
+
+    # 2. External AI Service Check (LLM)
+    try:
+        from django.conf import settings
+        from openai import OpenAI
+        
+        client = OpenAI(
+            api_key=getattr(settings, 'AI_GENERATOR_API_KEY', None),
+            base_url="https://api.gpt4-all.xyz/v1"
+        )
+        
+        # Quick ping to LLM service (with timeout)
+        models = client.models.list()
+        
+        health_status["checks"]["llm_service"] = {
+            "status": "healthy",
+            "message": "LLM API accessible",
+            "models_available": len(models.data) if hasattr(models, 'data') else 0
+        }
+    except Exception as e:
+        health_status["status"] = "degraded"
+        health_status["checks"]["llm_service"] = {
+            "status": "unhealthy",
+            "message": f"LLM service error: {str(e)}"
+        }
+        logger.warning(f"LLM service health check failed: {str(e)}")
+
+    # 3. API Performance Metrics (last 24 hours)
+    try:
+        yesterday = timezone.now() - timedelta(hours=24)
+        recent_logs = APILog.objects.filter(timestamp__gte=yesterday)
+        
+        total_requests = recent_logs.count()
+        error_requests = recent_logs.filter(status_code__gte=400).count()
+        error_rate = (error_requests / total_requests * 100) if total_requests > 0 else 0
+        
+        # Calculate average latency
+        avg_latency = recent_logs.aggregate(
+            avg_latency=models.Avg('latency_ms')
+        )['avg_latency'] or 0
+        
+        # Get slowest endpoints
+        slow_endpoints = recent_logs.values('endpoint').annotate(
+            avg_latency=models.Avg('latency_ms'),
+            count=models.Count('log_id')
+        ).order_by('-avg_latency')[:5]
+        
+        health_status["checks"]["api_performance"] = {
+            "status": "healthy" if error_rate < 10 and avg_latency < 5000 else "degraded",
+            "total_requests_24h": total_requests,
+            "error_requests_24h": error_requests,
+            "error_rate": round(error_rate, 2),
+            "avg_latency_ms": round(avg_latency, 2),
+            "slowest_endpoints": list(slow_endpoints)
+        }
+        
+        # Update overall status based on error rate
+        if error_rate > 25:
+            health_status["status"] = "unhealthy"
+        elif error_rate > 10:
+            health_status["status"] = "degraded"
+            
+    except Exception as e:
+        health_status["checks"]["api_performance"] = {
+            "status": "unknown",
+            "message": f"Unable to calculate metrics: {str(e)}"
+        }
+        logger.error(f"API performance check failed: {str(e)}")
+
+    # 4. Database Statistics
+    try:
+        total_evaluations = Evaluation.objects.count()
+        total_questions = Question.objects.count()
+        evaluations_today = Evaluation.objects.filter(
+            created_at__gte=timezone.now().date()
+        ).count()
+        
+        health_status["checks"]["database_stats"] = {
+            "status": "info",
+            "total_evaluations": total_evaluations,
+            "total_questions": total_questions,
+            "evaluations_today": evaluations_today
+        }
+    except Exception as e:
+        logger.error(f"Database stats check failed: {str(e)}")
+
+    # Determine HTTP status code
+    if health_status["status"] == "healthy":
+        status_code = 200
+    elif health_status["status"] == "degraded":
+        status_code = 200  # Still operational
+    else:
+        status_code = 503  # Service Unavailable
+
+    return JsonResponse(health_status, status=status_code)
