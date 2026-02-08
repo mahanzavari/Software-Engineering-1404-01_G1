@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد - آکادمی زبان</title>
+    <!-- CSS Files -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'team7/css/variables.css' %}">
+    <link rel="stylesheet" href="{% static 'team7/css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'team7/css/dashboard.css' %}"
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <a href="{% url 'team7:index' %}" class="logo-link">
+                        <div class="logo-icon">AI</div>
+                        <div class="logo-text">آکادمی زبان</div>
+                    </a>
+                </div>
+                <div class="header-actions">
+                    <div class="user-profile">
+                        <p class="user-name">سارا احمدی</p>
+                        <div class="user-avatar"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="menu-item active">
+                    <div class="menu-icon"></div>
+                    <span>داشبورد</span>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon"></div>
+                    <span>آزمون نوشتاری</span>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon"></div>
+                    <span>آزمون گفتاری</span>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon"></div>
+                    <span>گزارشات</span>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon"></div>
+                    <span>تنظیمات</span>
+                </div>
+            </aside>
+
+            <!-- Content Wrapper -->
+            <div class="content-wrapper">
+                <h1 class="page-title">داشبورد</h1>
+
+                <!-- Status Section -->
+                <section class="status-section">
+                    <div class="status-card">
+                        <div class="card-header">
+                            <div class="card-icon"></div>
+                            <p class="card-title">گزارش هفتگی</p>
+                        </div>
+                        <div class="report-row">
+                            <p class="report-label">زمان روزانه نوشتاری</p>
+                            <p class="report-value">45 دقیقه</p>
+                        </div>
+                        <div class="report-row">
+                            <p class="report-label">زمان روزانه گفتاری</p>
+                            <p class="report-value">30 دقیقه</p>
+                        </div>
+                        <div class="report-row">
+                            <p class="report-label">بهترین نمره نوشتاری</p>
+                            <p class="report-value">8.5</p>
+                        </div>
+                        <div class="report-row">
+                            <p class="report-label">بهترین نمره گفتاری</p>
+                            <p class="report-value">7.5</p>
+                        </div>
+                    </div>
+
+                    <div class="status-card">
+                        <div class="card-header">
+                            <div class="card-icon"></div>
+                            <p class="card-title">آزمون‌های گفتاری</p>
+                        </div>
+                        <p class="card-number">18</p>
+                        <p class="card-label">تعداد کل آزمون‌ها</p>
+                    </div>
+                    <div class="status-card">
+                        <div class="card-header">
+                            <div class="card-icon"></div>
+                            <p class="card-title">آزمون‌های نوشتاری</p>
+                        </div>
+                        <p class="card-number">24</p>
+                        <p class="card-label">تعداد کل آزمون‌ها</p>
+                    </div>
+                   
+                </section>
+
+                <!-- Charts Section -->
+                <section class="charts-section">
+                    <div class="chart-card">
+                        <h3 class="chart-title">نمودار فعالیت ماهانه</h3>
+                        <div class="chart-placeholder">
+                            <img src="{% static 'team7/images/activity chart.png' %}" alt="Activity Chart">
+                        </div>
+                    </div>
+                     <div class="chart-card">
+                        <h3 class="chart-title">نمودار پیشرفت هفتگی</h3>
+                        <div class="chart-placeholder">
+                            <img src="{% static 'team7/images/progress chart.png' %}" alt="Progress Chart">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Latest Exams Section -->
+                <section class="exams-section">
+                    <h2 class="section-title">آخرین آزمون‌ها</h2>
+                    <div class="exams-grid">
+                        <div class="exam-card">
+                            <div class="exam-badge writing">نوشتاری</div>
+                            <p class="exam-date">2 روز پیش</p>
+                            <p class="exam-title">Task 2: Technology and Education</p>
+                            <div class="exam-score">
+                                <span class="score-label">نمره:</span>
+                                <span class="score-value">8.5</span>
+                            </div>
+                             <div class="best-badge">بهترین نتیجه</div>
+                        </div>
+
+                        <div class="exam-card">
+                            <div class="exam-badge speaking">گفتاری</div>
+                            <p class="exam-date">3 روز پیش</p>
+                            <p class="exam-title">Part 2: Describe a memorable event</p>
+                            <div class="exam-score">
+                                <span class="score-label">نمره:</span>
+                                <span class="score-value">7.5</span>
+                            </div>
+                            <div class="best-badge">بهترین نتیجه</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Access Section -->
+                <section class="access-section">
+                    <div class="access-card">
+                        <h3 class="access-title">آزمون نوشتاری جدید</h3>
+                        <p class="access-description">مهارت نوشتاری خود را با آزمون‌های هوشمند ارتقا دهید</p>
+                        <button class="btn-start">شروع آزمون</button>
+                    </div>
+
+                    <div class="access-card">
+                        <h3 class="access-title">آزمون گفتاری جدید</h3>
+                        <p class="access-description">مهارت مکالمه خود را با تمرین‌های صوتی تقویت کنید</p>
+                        <button class="btn-start">شروع آزمون</button>
+                    </div>
+                </section>
+
+                <!-- Statistics Section -->
+                <section class="statistics-section">
+                    <h2 class="section-title">آمار و تحلیل عملکرد</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 class="stat-title">دقت گرامری</h3>
+                            <div class="stat-chart">
+                                <img src="{% static 'team7/images/grammar chart.png' %}" alt="Accuracy Chart">
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">میزان دقت</span>
+                                <span class="stat-value">85%</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <h3 class="stat-title">دامنه واژگان</h3>
+                            <div class="stat-chart">
+                                <img src="{% static 'team7/images/vocabulary chart.png' %}" alt="Vocabulary Chart">
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">سطح واژگان</span>
+                                <span class="stat-value">72%</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <h3 class="stat-title">روانی گفتار</h3>
+                            <div class="stat-chart">
+                                <img src="{% static 'team7/images/Fluency Chart.png' %}" alt="Fluency Chart">
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">میزان روانی</span>
+                                <span class="stat-value">78%</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="{% static 'team7/js/shared.js' %}"></script>
+    <script src="{% static 'team7/js/dashboard.js' %}"></script>
+</body>
+</html>
+</body>
+</html>

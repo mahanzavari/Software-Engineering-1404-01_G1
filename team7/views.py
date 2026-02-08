@@ -18,9 +18,14 @@ def ping(request):
     return JsonResponse({"team": TEAM_NAME, "ok": True})
 
 
-def base(request):
-    """Serve team7 index page."""
+def index(request):
+    """Serve team7 home page (landing page)."""
     return render(request, f"{TEAM_NAME}/index.html")
+
+
+def dashboard(request):
+    """Serve team7 dashboard page (user dashboard)."""
+    return render(request, f"{TEAM_NAME}/dashboard.html")
 
 
 @csrf_exempt
