@@ -10,3 +10,6 @@ def ping(request):
 
 def base(request):
     return render(request, f"{TEAM_NAME}/index.html")
+
+def training_levels(request):
+    return render(request, 'team14/training_levels.html')
