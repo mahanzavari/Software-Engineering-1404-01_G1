@@ -1,0 +1,568 @@
+/* ==================== EXAM PAGE STYLES ==================== */
+
+/* ==================== EXAM PAGE BODY ==================== */
+body {
+    background: var(--gradient-secondary);
+}
+
+/* ==================== HERO SECTION ==================== */
+.hero-section {
+    background: transparent;
+    padding: var(--spacing-3xl) var(--spacing-4xl);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.hero-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3xl);
+}
+
+.hero-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.hero-badge {
+    background: rgba(255, 176, 45, 0.15);
+    color: var(--color-accent-pink);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: 24px;
+    font-weight: var(--font-weight-medium);
+    font-size: 14px;
+    text-align: center;
+    width: 100;
+}
+
+.hero-title {
+    font-weight: var(--font-weight-bold);
+    font-size: 48px;
+    color: var(--color-primary-dark);
+    text-align: right;
+}
+
+.hero-description {
+    font-weight: var(--font-weight-regular);
+    font-size: 18px;
+    color: var(--color-accent-blue);
+    text-align: right;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.start-exam-button,
+.learn-more-button {
+    padding: 16px 32px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-weight: var(--font-weight-bold);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.start-exam-button {
+    background: var(--gradient-primary);
+    color: var(--color-white);
+    box-shadow: var(--shadow-md);
+}
+
+.start-exam-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.learn-more-button {
+    background: var(--color-white);
+    color: var(--color-accent-pink);
+    border: 2px solid var(--color-border);
+}
+
+.learn-more-button:hover {
+    background: var(--color-background-light);
+    border-color: var(--color-primary-dark);
+}
+
+.hero-image {
+    flex: 1;
+    height: 545px;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ==================== EXAMS SECTION ==================== */
+.exams-section {
+    padding: var(--spacing-3xl) var(--spacing-4xl);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.exams-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xl);
+}
+
+.exam-category {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.carousel-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel {
+    display: flex;
+    gap: var(--spacing-lg);
+    transition: transform 0.5s ease;
+    overflow-x: auto;
+    padding-bottom: var(--spacing-md);
+    scroll-behavior: smooth;
+}
+
+.carousel::-webkit-scrollbar {
+    height: 4px;
+}
+
+.carousel::-webkit-scrollbar-thumb {
+    background: var(--color-accent-pink);
+    border-radius: 2px;
+}
+
+.exam-card {
+    background: var(--color-white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    min-width: 430px;
+    max-width: 530px;
+    position: relative;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+}
+
+.exam-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.exam-card.blur-card {
+    filter: blur(2px);
+    opacity: 0.7;
+}
+
+.exam-card.active-card {
+    box-shadow: var(--shadow-lg);
+    min-width: 530px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.type-tag {
+    background: rgba(250, 11, 103, 0.15);
+    color: var(--color-accent-pink);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 20px;
+    font-weight: var(--font-weight-medium);
+    font-size: 13px;
+}
+
+.difficulty-badge {
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-weight: var(--font-weight-medium);
+    font-size: 12px;
+}
+
+.difficulty-badge.green {
+    background: rgba(76, 175, 80, 0.15);
+    color: var(--color-success);
+}
+
+.difficulty-badge.yellow {
+    background: rgba(255, 176, 45, 0.15);
+    color: #ffb02d;
+}
+
+.difficulty-badge.red {
+    background: rgba(250, 11, 103, 0.15);
+    color: var(--color-accent-pink);
+}
+
+.card-title {
+    font-weight: var(--font-weight-bold);
+    font-size: 20px;
+    color: var(--color-primary-dark);
+    text-align: right;
+}
+
+.card-description {
+    font-weight: var(--font-weight-regular);
+    font-size: 15px;
+    color: var(--color-primary-light);
+    text-align: right;
+    line-height: 1.5;
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-weight: var(--font-weight-medium);
+    font-size: 14px;
+    color: var(--color-accent-blue);
+}
+
+.meta-icon {
+    width: 20px;
+    height: 20px;
+    background: var(--color-accent-blue-light);
+    border-radius: var(--radius-sm);
+}
+
+.card-button {
+    background: var(--gradient-primary);
+    color: var(--color-white);
+    padding: 14px 28px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-weight: var(--font-weight-bold);
+    font-size: 15px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.card-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.carousel-controls {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-lg) 0;
+}
+
+.carousel-btn {
+    background: none;
+    border: 2px solid var(--color-primary-dark);
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    color: var(--color-primary-dark);
+    font-size: 20px;
+}
+
+.carousel-btn:hover {
+    background: var(--color-primary-dark);
+    color: var(--color-white);
+    transform: scale(1.05);
+}
+
+/* ==================== HISTORY SECTION ==================== */
+.history-section {
+    background: var(--color-white);
+    padding: var(--spacing-4xl);
+}
+
+.history-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.history-tabs {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.tab-button {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    border: none;
+    font-weight: var(--font-weight-medium);
+    font-size: 15px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    background: var(--color-background-light);
+    color: var(--color-primary-dark);
+}
+
+.tab-button.active {
+    background: rgba(250, 11, 103, 0.15);
+    color: var(--color-accent-pink);
+}
+
+.tab-button:hover {
+    background: var(--color-background-light);
+}
+
+/* ==================== HISTORY TABLE ==================== */
+.history-table {
+    background: var(--color-background-light);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: var(--spacing-xl);
+}
+
+.table-header {
+    background: var(--color-primary-dark);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    color: var(--color-white);
+    font-weight: var(--font-weight-bold);
+    font-size: 14px;
+    text-align: center;
+}
+
+.table-row {
+    background: var(--color-white);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    align-items: center;
+    text-align: center;
+    font-weight: var(--font-weight-medium);
+    font-size: 15px;
+    color: var(--color-primary-dark);
+    border-bottom: 1px solid var(--color-border);
+    transition: background var(--transition-fast);
+}
+
+.table-row:hover {
+    background: var(--color-background-light);
+}
+
+.table-row:last-child {
+    border-bottom: none;
+}
+
+.view-button {
+    background: rgba(250, 11, 103, 0.1);
+    color: var(--color-accent-pink);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    border: none;
+    font-weight: var(--font-weight-medium);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.view-button:hover {
+    background: rgba(250, 11, 103, 0.2);
+    transform: scale(1.05);
+}
+
+.score-badge {
+    background: rgba(76, 175, 80, 0.15);
+    color: var(--color-success);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-weight-bold);
+    font-size: 14px;
+    display: inline-block;
+}
+
+/* ==================== PAGINATION ==================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl) 0;
+}
+
+.pagination-button {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-weight: var(--font-weight-medium);
+    font-size: 15px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    background: var(--color-white);
+    color: var(--color-primary-dark);
+    box-shadow: var(--shadow-sm);
+}
+
+.pagination-button.active {
+    background: var(--gradient-primary);
+    color: var(--color-white);
+    box-shadow: var(--shadow-md);
+}
+
+.pagination-button:hover:not(.active) {
+    background: var(--color-background-light);
+    transform: translateY(-2px);
+}
+
+.pagination-dots {
+    font-weight: var(--font-weight-bold);
+    font-size: 18px;
+    color: var(--color-primary-light);
+}
+
+/* ==================== CHAT ICON ==================== */
+.chat-icon {
+    position: fixed;
+    bottom: var(--spacing-xl);
+    left: var(--spacing-xl);
+    cursor: pointer;
+    transition: transform var(--transition-normal);
+    z-index: 50;
+}
+
+.chat-icon:hover {
+    transform: scale(1.1);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 1200px) {
+    .hero-content-wrapper {
+        flex-direction: column;
+        gap: var(--spacing-xl);
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 524px;
+        height: auto;
+    }
+
+    .exam-card {
+        min-width: 350px;
+    }
+
+    .exam-card.active-card {
+        min-width: 450px;
+    }
+
+    .table-header,
+    .table-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section,
+    .exams-section {
+        padding: var(--spacing-xl) var(--spacing-lg);
+    }
+
+    .hero-content-wrapper {
+        padding: 0;
+        gap: var(--spacing-lg);
+    }
+
+    .hero-title {
+        font-size: 32px;
+    }
+
+    .hero-description {
+        font-size: 16px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .start-exam-button,
+    .learn-more-button {
+        width: 100%;
+    }
+
+    .hero-image {
+        height: 300px;
+    }
+
+    .exam-card {
+        min-width: 280px;
+    }
+
+    .exam-card.active-card {
+        min-width: 300px;
+    }
+
+    .carousel {
+        gap: var(--spacing-md);
+    }
+
+    .history-section {
+        padding: var(--spacing-xl) var(--spacing-lg);
+    }
+
+    .history-header {
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        align-items: flex-start;
+    }
+
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+    }
+
+    .table-header div,
+    .table-row div {
+        padding: var(--spacing-sm) 0;
+    }
+
+    .pagination {
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+
+    .chat-icon {
+        width: 60px;
+        height: 60px;
+    }
+}
