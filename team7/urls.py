@@ -31,4 +31,5 @@ urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
     path("exams/", views.exams, name="exams"),
     path("writing-exam/", views.writing_exam, name="writing-exam"),
+    path("speaking-exam/", views.speaking_exam, name="speaking-exam"),
 ]

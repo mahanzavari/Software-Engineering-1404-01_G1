@@ -42,6 +42,11 @@ def writing_exam(request):
     return render(request, f"{TEAM_NAME}/writing-exam.html")
 
 
+def speaking_exam(request):
+    """Serve team7 speaking exam page (speaking exam taking interface)."""
+    return render(request, f"{TEAM_NAME}/speaking-exam.html")
+
+
 @csrf_exempt
 @require_http_methods(["POST"])
 @api_login_required
