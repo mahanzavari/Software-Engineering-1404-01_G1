@@ -245,11 +245,11 @@ function renderHistoryTable(items) {
         row.className = 'table-row';
         
         row.innerHTML = `
-            <div><button class="view-button">مشاهده جزئیات</button></div>
-            <div><span class="score-badge">${item.score}</span></div>
-            <div>${item.duration}</div>
-            <div>${item.date}</div>
             <div data-title="${item.title}">${item.title}</div>
+            <div>${item.date}</div>
+            <div>${item.duration}</div>
+            <div><span class="score-badge">${item.score}</span></div>
+            <div><button class="view-button">مشاهده جزئیات</button></div>
         `;
         
         tableBody.appendChild(row);
