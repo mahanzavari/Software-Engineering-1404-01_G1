@@ -191,55 +191,82 @@
             Generate Next Word ✨
         </button>
     </div>
-
     <script>
-        // Function to fill the UI with AI data
-        function renderWord(data) {
-            document.getElementById('word-text').textContent = data.word;
-            document.getElementById('word-level').textContent = data.level;
-            document.getElementById('word-phonetic').textContent = data.phonetic || '';
-            document.getElementById('word-definition').textContent = data.definition;
-
-            // Render lists
-            const renderList = (id, items, className) => {
-                const container = document.getElementById(id);
-                container.innerHTML = items.map(item => `<span class="tag ${className}">${item}</span>`).join('');
-            };
-
-            renderList('word-synonyms', data.synonyms, 'tag-syn');
-            renderList('word-antonyms', data.antonyms, 'tag-ant');
-            renderList('word-collocations', data.collocations, 'tag-coll');
-
-            // Render examples
-            const exContainer = document.getElementById('word-examples');
-            exContainer.innerHTML = data.examples.map(ex => `<div class="example-item">${ex}</div>`).join('');
-        }
-
-        // Call the API
-        async function generateNewWord() {
-            const btn = document.getElementById('nextBtn');
-            btn.disabled = true;
-            btn.textContent = "AI is thinking...";
-
-            try {
-                // This calls your team8 backend
-                const response = await fetch('/team8/api/generate-full/?level=B2');
-                const data = await response.json();
-
-                if (data.word) {
-                    renderWord(data);
+    // 1. Helper function to get the CSRF token from Django's cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Failed to connect to AI server!");
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Generate Next Word ✨";
             }
         }
+        return cookieValue;
+    }
 
-        // Auto-load on start
-        window.onload = generateNewWord;
+    // 2. Function to update the UI with the AI data
+    function renderWord(data) {
+        document.getElementById('word-text').textContent = data.word;
+        document.getElementById('word-level').textContent = "B2"; 
+        document.getElementById('word-phonetic').textContent = data.ipa;
+        document.getElementById('word-definition').textContent = data.definition;
+
+        const renderList = (id, items, className) => {
+            const container = document.getElementById(id);
+            // Handles both lists and comma-separated strings
+            const list = Array.isArray(items) ? items : (items ? items.split(',') : []);
+            container.innerHTML = list.map(item => `<span class="tag ${className}">${item.trim()}</span>`).join('');
+        };
+
+        renderList('word-synonyms', data.synonyms, 'tag-syn');
+        renderList('word-antonyms', data.antonyms, 'tag-ant');
+        renderList('word-collocations', data.collocations, 'tag-coll');
+
+        const exContainer = document.getElementById('word-examples');
+        const examples = Array.isArray(data.examples) ? data.examples : [];
+        exContainer.innerHTML = examples.map(ex => `<div class="example-item">${ex}</div>`).join('');
+    }
+
+    // 3. The Core Function: Calls your actual Django View
+    async function generateNewWord() {
+        const btn = document.getElementById('nextBtn');
+        btn.disabled = true;
+        btn.textContent = "AI is thinking...";
+
+        try {
+            // WE CHANGE THIS URL to match your urls.py
+            const response = await fetch('/team8/wordcard/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'), // Required by Django
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: '' // Sending empty body tells backend to generate a random word
+            });
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+                renderWord(result.data);
+            } else {
+                alert("Error from AI: " + (result.error || "Unknown error"));
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Failed to connect to Team 8 server!");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Generate Next Word ✨";
+        }
+    }
+
+    // Auto-load a word when the page first opens
+    window.onload = generateNewWord;
     </script>
+
 </body>
 </html>

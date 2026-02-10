@@ -1,10 +1,11 @@
 from django.db import models
 
 class LearningWord(models.Model):
-    user_id = models.IntegerField() # From Core Auth
+    user_id = models.IntegerField() 
     word = models.CharField(max_length=100)
     
     ipa_pronunciation = models.CharField(max_length=100, blank=True)
+    definition = models.TextField(blank=True) # Added for your new UI
     synonyms = models.TextField(blank=True)
     antonyms = models.TextField(blank=True)
     collocations = models.TextField(blank=True)
