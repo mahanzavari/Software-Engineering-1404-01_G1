@@ -13,3 +13,16 @@ def base(request):
 
 def training_levels(request):
     return render(request, 'team14/training_levels.html')
+
+
+def index(request):
+    return render(request, 'team14/index.html')
+
+def easy_level(request):
+    return render(request, 'team14/Easy_Level.html')
+
+def mid_level(request):
+    return render(request, 'team14/Mid_Level.html')
+
+def hard_level(request):
+    return render(request, 'team14/Hard_Level.html')
