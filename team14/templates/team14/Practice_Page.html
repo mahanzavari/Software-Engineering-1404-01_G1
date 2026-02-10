@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ passage.title }} - تمرین ریدینگ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f7fafc;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+
+        .icon-button:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .passage-info {
+            font-size: 14px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .question-counter {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .timer {
+            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .dot.answered {
+            background: #48bb78;
+        }
+
+        .dot.current {
+            background: #4299e1;
+            transform: scale(1.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .passage-panel, .question-panel {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .passage-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .passage-text {
+            line-height: 2;
+            color: #4a5568;
+            font-size: 16px;
+            text-align: justify;
+            max-height: 550px;
+            overflow-y: auto;
+            padding-left: 15px;
+        }
+
+        .passage-text::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .passage-text::-webkit-scrollbar-track {
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .passage-text::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+
+        .passage-text p {
+            margin-bottom: 15px;
+        }
+
+        /* Question Section */
+        .question-type-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            padding: 18px 22px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 15px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .option:hover {
+            border-color: #4299e1;
+            background: #ebf8ff;
+            transform: translateX(-5px);
+        }
+
+        .option.selected {
+            border-color: #4299e1;
+            background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+            font-weight: 600;
+        }
+
+        .option-label {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #cbd5e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #4a5568;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-label {
+            background: #4299e1;
+            border-color: #4299e1;
+            color: white;
+        }
+
+        /* Navigation Buttons */
+        .navigation-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .btn-previous {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+
+        .btn-previous:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(66, 153, 225, 0.3);
+        }
+
+        .btn-flag {
+            background: #fff5f5;
+            color: #fc8181;
+            flex: 0.5;
+        }
+
+        .btn-flag:hover {
+            background: #fed7d7;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Helper Buttons */
+        .helper-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .helper-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Vazirmatn', sans-serif;
+            color: #4a5568;
+        }
+
+        .helper-btn:hover {
+            border-color: #4299e1;
+            background: #ebf8ff;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .passage-panel {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .passage-panel, .question-panel {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="user-section">
+                <button class="icon-button">⚙️</button>
+                <button class="icon-button">🇮🇷</button>
+                <button class="icon-button">🔔</button>
+                <button class="icon-button">ورود</button>
+            </div>
+            <nav class="nav-links">
+                <a href="#">درباره ما</a>
+                <a href="{% url 'easy_level' %}">شروع یادگیری</a>
+                <a href="#">خانه</a>
+            </nav>
+            <div class="logo-section">
+                <div class="logo">T</div>
+                <div class="logo-text">TOEFL Master</div>
+            </div>
+        </header>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <div class="passage-info">
+                    Passage <span id="current-passage">1</span> از {{ passage.question_set.count }}
+                    <span style="margin-right: 15px;">مدت زمان پیشنهادی: 18 دقیقه</span>
+                </div>
+                <div class="question-counter">
+                    سوالات پاسخ داده شده: <span id="answered-count">0</span> / {{ total_questions }}
+                </div>
+                <div class="timer" id="timer">
+                    <span>⏱️</span>
+                    <span id="time-display">54:32</span>
+                </div>
+            </div>
+
+            <div class="progress-dots" id="progress-dots">
+                <!-- Dots will be generated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Passage Panel -->
+            <div class="passage-panel">
+                <h2 class="passage-title">{{ passage.title }}</h2>
+                <div class="passage-text">
+                    {{ passage.text|linebreaks }}
+                </div>
+            </div>
+
+            <!-- Question Panel -->
+            <div class="question-panel">
+                <div id="question-container">
+                    <!-- سوالات با JavaScript رندر می‌شوند -->
+                </div>
+
+                <div class="helper-buttons">
+                    <button class="helper-btn">📌 علامت‌گذاری</button>
+                    <button class="helper-btn">❌ حذف</button>
+                    <button class="helper-btn">سوال قبلی</button>
+                    <button class="helper-btn" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none;">
+                        ارسال آزمون
+                    </button>
+                </div>
+
+                <div class="navigation-buttons">
+                    <button class="btn btn-previous" id="btn-previous">
+                        → سوال قبلی
+                    </button>
+                    <button class="btn btn-flag" id="btn-flag">
+                        🚩 علامت‌گذاری
+                    </button>
+                    <button class="btn btn-next" id="btn-next">
+                        سوال بعدی ←
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // داده‌های اولیه از Django
+        const questions = {{ questions|safe }};
+        const userAnswers = {{ user_answers|safe }};
+        const sessionId = {{ session.id }};
+        const csrfToken = '{{ csrf_token }}';
+
+        let currentQuestionIndex = 0;
+        let selectedAnswers = { ...userAnswers };
+
+        // تولید Dots
+        function generateProgressDots() {
+            const dotsContainer = document.getElementById('progress-dots');
+            dotsContainer.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                if (selectedAnswers[q.id]) dot.classList.add('answered');
+                if (index === currentQuestionIndex) dot.classList.add('current');
+
+                dot.addEventListener('click', () => {
+                    currentQuestionIndex = index;
+                    renderQuestion();
+                });
+
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        // رندر سوال فعلی
+        function renderQuestion() {
+            const question = questions[currentQuestionIndex];
+            const container = document.getElementById('question-container');
+
+            const questionTypeMap = {
+                'factual': 'Factual Information',
+                'vocabulary': 'Vocabulary in Context',
+                'inference': 'Inference',
+                'negative_factual': 'Negative Factual'
+            };
+
+            container.innerHTML = `
+                <div class="question-type-badge">
+                    سوال ${currentQuestionIndex + 1} از ${questions.length}
+                </div>
+                <div class="question-text">${question.question_text}</div>
+                <div class="options-container">
+                    ${question.options.map((option, idx) => `
+                        <div class="option ${selectedAnswers[question.id] == option.id ? 'selected' : ''}"
+                             data-option-id="${option.id}"
+                             onclick="selectOption(${question.id}, ${option.id})">
+                            <div class="option-label">${String.fromCharCode(65 + idx)}</div>
+                            <div>${option.text}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            updateNavigationButtons();
+            generateProgressDots();
+            updateAnsweredCount();
+        }
+
+        // انتخاب گزینه
+        function selectOption(questionId, optionId) {
+            selectedAnswers[questionId] = optionId;
+
+            // ارسال AJAX برای ذخیره پاسخ
+            fetch('/team14/submit-answer/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    question_id: questionId,
+                    option_id: optionId,
+                    session_id: sessionId
+                })
+            });
+
+            renderQuestion();
+        }
+
+        // آپدیت دکمه‌های navigation
+        function updateNavigationButtons() {
+            document.getElementById('btn-previous').disabled = currentQuestionIndex === 0;
+            document.getElementById('btn-next').textContent =
+                currentQuestionIndex === questions.length - 1 ? 'اتمام تمرین ←' : 'سوال بعدی ←';
+        }
+
+        // آپدیت تعداد پاسخ‌های داده شده
+        function updateAnsweredCount() {
+            const count = Object.keys(selectedAnswers).length;
+            document.getElementById('answered-count').textContent = count;
+        }
+
+        // Navigation handlers
+        document.getElementById('btn-previous').addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        });
+
+        document.getElementById('btn-next').addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                // اتمام تمرین
+                if (confirm('آیا می‌خواهید تمرین را به پایان برسانید؟')) {
+                    window.location.href = `/team14/finish-practice/${sessionId}/`;
+                }
+            }
+        });
+
+        // Timer
+        let timeLeft = 54 * 60 + 32; // 54:32
+        setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('time-display').textContent =
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                alert('زمان به پایان رسید!');
+                window.location.href = `/team14/finish-practice/${sessionId}/`;
+            }
+        }, 1000);
+
+        // شروع اولیه
+        renderQuestion();
+    </script>
+</body>
+</html>

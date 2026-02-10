@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تمرین ریدینگ متوسط - تافل</title>
+    <title>تمرین ریدینگ {{ difficulty }} - تافل</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -72,6 +73,23 @@
             0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.15; }
             50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.25; }
         }
+
+        .no-data-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 2px dashed rgba(93, 152, 217, 0.3);
+}
+
+.no-data-message p {
+    font-size: 18px;
+    color: #5d98d9;
+    font-weight: 600;
+}
+
 
         /* Floating Particles */
         .particles {
@@ -992,6 +1010,10 @@
             box-shadow: 0 10px 30px rgba(88, 124, 230, 0.35);
             position: relative;
             overflow: hidden;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .start-button::before {
@@ -1345,14 +1367,14 @@
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="page-title">
-            <h1>تمرین ریدینگ متوسط</h1>
+            <h1>تمرین ریدینگ {{ difficulty }}</h1>
             <p class="page-subtitle">برای شروع یکی از کارت‌های زیر را انتخاب کن!</p>
         </div>
 
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="stat-icon">📚</div>
-                <div class="stat-number">120+</div>
+                <div class="stat-number">{{ total_passages }}+</div>
                 <div class="stat-label">تمرین موجود</div>
             </div>
             <div class="stat-item">
@@ -1422,127 +1444,63 @@
                             <option>بلند (بالای 700 کلمه)</option>
                         </select>
                     </div>
-
-
                 </div>
             </aside>
 
             <!-- Exercise Cards -->
-            <main class="exercises-grid">
-                <!-- Card 1 -->
-                <article class="exercise-card">
+    <main class="exercises-grid">
+        {% for passage in passages %}
+        <article class="exercise-card">
+            <div class="card-content-wrapper">
+                <div class="card-icon-large">{{ passage.icon }}</div>
+                <div class="card-main-content">
+                    <h2 class="card-title">{{ passage.title }}</h2>
 
-                    <div class="card-content-wrapper">
-                        <div class="card-icon-large">🧬</div>
-                        <div class="card-main-content">
-                            <h2 class="card-title">Human Migration Patterns</h2>
-                            <div class="card-meta">
-                                <div class="meta-item">
-                                    <span class="meta-icon">📖</span>
-                                    <span>زیست‌شناسی</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-icon">📏</span>
-                                    <span>550 کلمه</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-icon">⏱️</span>
-                                    <span>18 دقیقه</span>
-                                </div>
-                                <div class="difficulty-badge difficulty-medium">سطح متوسط</div>
-                            </div>
-                            <p class="card-description">
-                                بررسی جامع الگوهای مهاجرت انسان‌ها در طول تاریخ و تأثیر آن بر تحولات فرهنگی و اجتماعی جوامع مختلف.
-                            </p>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <span class="meta-icon">📖</span>
+                            <span>{{ passage.topic }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-icon">📏</span>
+                            <span>{{ passage.text_length }} کلمه</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-icon">⏱️</span>
+                            <span>{{ passage.estimated_time }} دقیقه</span>
+                        </div>
+                        <div class="difficulty-badge difficulty-{{ difficulty_level }}">
+                            سطح {{ difficulty_persian }}
                         </div>
                     </div>
-                    <div class="card-footer">
-                        <div class="question-count">
-                            <div class="count-badge">
-                                <span>📝</span>
-                                <span>25 سوال</span>
-                            </div>
-                        </div>
-                        <button class="start-button">شروع تمرین ←</button>
-                    </div>
-                </article>
 
-                <!-- Card 2 -->
-                <article class="exercise-card">
+                    <p class="card-description">
+                        تمرین جامع درک مطلب {{ passage.title }}
+                    </p>
+                </div>
+            </div>
 
-                    <div class="card-content-wrapper">
-                        <div class="card-icon-large">💻</div>
-                        <div class="card-main-content">
-                            <h2 class="card-title">The Impact of Technology on Education</h2>
-                            <div class="card-meta">
-                                <div class="meta-item">
-                                    <span class="meta-icon">📖</span>
-                                    <span>تکنولوژی</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-icon">📏</span>
-                                    <span>700 کلمه</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-icon">⏱️</span>
-                                    <span>20 دقیقه</span>
-                                </div>
-                                <div class="difficulty-badge difficulty-medium">سطح متوسط</div>
-                            </div>
-                            <p class="card-description">
-                                تحلیل تأثیرات انقلاب دیجیتال بر سیستم‌های آموزشی و نحوه یادگیری دانش‌آموزان در عصر جدید.
-                            </p>
-                        </div>
+            <div class="card-footer">
+                <div class="question-count">
+                    <div class="count-badge">
+                        <span>📝</span>
+                        <span>{{ passage.question_count }} سوال</span>
                     </div>
-                    <div class="card-footer">
-                        <div class="question-count">
-                            <div class="count-badge">
-                                <span>📝</span>
-                                <span>40 سوال</span>
-                            </div>
-                        </div>
-                        <button class="start-button">شروع تمرین ←</button>
-                    </div>
-                </article>
+                </div>
+                <a href="{% url 'practice_page' passage.id %}"
+                   class="start-button">
+                    شروع تمرین ←
+                </a>
+            </div>
+        </article>
 
-                <!-- Card 3 -->
-                <article class="exercise-card">
+        {% empty %}
+        <div style="text-align: center; padding: 60px;">
+            <p>😔 هنوز تمرینی ثبت نشده است</p>
+        </div>
+        {% endfor %}
+    </main>
 
-                    <div class="card-content-wrapper">
-                        <div class="card-icon-large">🏃</div>
-                        <div class="card-main-content">
-                            <h2 class="card-title">The Importance of Healthy Lifestyle</h2>
-                            <div class="card-meta">
-                                <div class="meta-item">
-                                    <span class="meta-icon">📖</span>
-                                    <span>سلامت</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-icon">📏</span>
-                                    <span>700 کلمه</span>
-                                </div>
-                                <div class="meta-item">
-                                    <span class="meta-icon">⏱️</span>
-                                    <span>20 دقیقه</span>
-                                </div>
-                                <div class="difficulty-badge difficulty-medium">سطح متوسط</div>
-                            </div>
-                            <p class="card-description">
-                                اهمیت سبک زندگی سالم و تأثیر تغذیه صحیح و فعالیت بدنی بر سلامت جسمی و روانی افراد.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="question-count">
-                            <div class="count-badge">
-                                <span>📝</span>
-                                <span>35 سوال</span>
-                            </div>
-                        </div>
-                        <button class="start-button">شروع تمرین ←</button>
-                    </div>
-                </article>
-            </main>
         </div>
     </div>
 

@@ -11,11 +11,17 @@ class UserSession(models.Model):
         ('practice', 'Practice Mode'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.CharField(max_length=36)
     mode = models.CharField(max_length=10, choices=MODE_CHOICES)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField(null=True, blank=True)
-
+    passage = models.ForeignKey(
+        'Passage',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='sessions'
+    )
     total_score = models.IntegerField(null=True, blank=True)
     scaled_score = models.FloatField(null=True, blank=True)
     exam_version = models.CharField(max_length=50)
