@@ -235,8 +235,10 @@
         </div>
     </footer>
 
-    <!-- JavaScript Files -->
-    <script src="{% static 'team7/js/shared.js' %}"></script>
-    <script src="{% static 'team7/js/home.js' %}"></script>
+    <!-- JavaScript Files - Load auth.js first -->
+    <script src="{% static 'team7/js/auth.js' %}"></script>
+    <script src="{% static 'team7/js/auth-debug.js' %}"></script>
+    <script src="{% static 'team7/js/shared.js' %}" defer></script>
+    <script src="{% static 'team7/js/home.js' %}" defer></script>
 </body>
 </html>

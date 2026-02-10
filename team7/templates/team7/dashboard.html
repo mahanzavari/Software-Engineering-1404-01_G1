@@ -26,7 +26,11 @@
                 </div>
                 <div class="header-actions">
                     <div class="user-profile">
-                        <p class="user-name">سارا احمدی</p>
+                        {% if user.is_authenticated %}
+                            <p class="user-name">{{ user.first_name }} {{ user.last_name }}{% if not user.first_name %}{{ user.email }}{% endif %}</p>
+                        {% else %}
+                            <p class="user-name">مهمان</p>
+                        {% endif %}
                         <div class="user-avatar"></div>
                     </div>
                 </div>
@@ -208,10 +212,10 @@
         </div>
     </div>
 
-    <!-- JavaScript Files -->
-    <script src="{% static 'team7/js/shared.js' %}"></script>
-    <script src="{% static 'team7/js/dashboard.js' %}"></script>
-</body>
-</html>
+    <!-- JavaScript Files - Load auth.js first -->
+    <script src="{% static 'team7/js/auth.js' %}"></script>
+    <script src="{% static 'team7/js/auth-debug.js' %}"></script>
+    <script src="{% static 'team7/js/shared.js' %}" defer></script>
+    <script src="{% static 'team7/js/dashboard.js' %}" defer></script>
 </body>
 </html>
