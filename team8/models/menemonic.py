@@ -1,5 +1,5 @@
 from django.db import models
-from .word import Word
+from .Word import Word
 
 
 class WordStory(models.Model):

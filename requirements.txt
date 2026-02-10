@@ -6,3 +6,7 @@ mysqlclient
 PyMySQL
 gunicorn
 whitenoise
+requests
+groq
+python-dotenv
+Pillow

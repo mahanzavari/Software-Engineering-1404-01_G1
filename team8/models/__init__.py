@@ -1,10 +1,11 @@
-from . import Word, DifficultyLevel
-from . import WordStory
-from .ReadingMaterial import *
+from .Word import Word
+from .Word import DifficultyLevel
+from .menemonic import WordStory
+from .ReadingMaterial import ReadingMaterial
 
 __all__ = [
     "Word",
     "DifficultyLevel",
     "WordStory",
+    "ReadingMaterial",
 ]
-
