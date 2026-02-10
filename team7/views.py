@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
@@ -361,3 +362,47 @@ def admin_health(request):
         status_code = 503  # Service Unavailable
 
     return JsonResponse(health_status, status=status_code)
+
+
+def favicon(request):
+    return HttpResponse(status=204)
+
+@api_login_required
+def get_exam_details(request):
+    try:
+        exam_id = request.GET.get('exam_id', 'general')
+        exam_type = 'speaking' if 'speak' in exam_id else 'writing'
+        
+        questions_qs = Question.objects.filter(task_type=exam_type)
+        
+        questions_data = []
+        if questions_qs.exists():
+            for q in questions_qs:
+                questions_data.append({
+                    "id": str(q.question_id),
+                    "title": f"Level {q.difficulty}",
+                    "text": q.prompt_text,
+                    "duration": 120,
+                    "preparation_time": 45
+                })
+        else:
+            questions_data = [{
+                "id": "default-1",
+                "title": "Default Question",
+                "text": "Please describe your favorite teacher and why you like them.",
+                "duration": 120,
+                "preparation_time": 45
+            }]
+
+        return JsonResponse({
+            "id": exam_id,
+            "title": f"{exam_type.capitalize()} Exam",
+            "questions": questions_data
+        })
+    except Exception as e:
+        logger.error(f"Error in exam details: {str(e)}")
+        return JsonResponse({
+            "id": "error",
+            "title": "Error Loading Exam",
+            "questions": []
+        })

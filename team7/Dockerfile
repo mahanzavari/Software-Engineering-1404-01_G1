@@ -1,18 +1,20 @@
 FROM python:3.11-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-WORKDIR /app
+# This is now the project root, one level above the code
+WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install -y build-essential curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y     pkg-config     default-libmysqlclient-dev     build-essential     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt ./
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY . .
+# CRITICAL FIX: Copy all code into a 'team7' subdirectory
+COPY . ./team7/
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-
+# This command now works because 'team7' is a visible module
+CMD ["gunicorn", "team7.wsgi:application", "--bind", "0.0.0.0:8000"]
