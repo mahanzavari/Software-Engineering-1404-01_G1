@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count
 import random
+from django.utils import timezone
 
 from core.auth import api_login_required
 from django.contrib.auth.decorators import login_required
@@ -191,20 +192,32 @@ def practice_page(request, passage_id):
     # و شما قصد دارید شناسه کاربر را به صورت رشته‌ای ذخیره کنید، پس استفاده از request.user.id صحیح است.
     # اما اگر ForeignKey به مدل User است، باید خود شیء User را پاس دهید.
     # با توجه به تعریف UserSession که user_id: models.CharField است، request.user.id درست است.
-    session, created = UserSession.objects.get_or_create(
-        user_id=request.user.id,
+    session = UserSession.objects.filter(
+        user_id=str(request.user.id),
         passage=passage,
-        mode='practice',
-        defaults={'start_time': timezone.now()}
-    )
+        end_time__isnull=True
+    ).order_by('-start_time').first()
+
+    if not session:
+        session = UserSession.objects.create(
+            user_id=str(request.user.id),
+            passage=passage,
+            mode='practice',
+            start_time=timezone.now()
+        )
 
     user_answers = {
         ans.question_id: ans.selected_option_id
         for ans in UserAnswer.objects.filter(session=session)
     }
+    is_exam = session.mode == 'exam'
+    elapsed = (timezone.now() - session.start_time).total_seconds()
 
-    elapsed = (timezone.now() - session.start_time).seconds
-    time_left = max(0, 18 * 60 - elapsed)
+
+    if is_exam:
+        time_left = max(0, session.exam_duration - elapsed)
+    else:
+        time_left = max(0, 18 * 60 - elapsed)
 
     context = {
         'passage': passage,
@@ -213,6 +226,8 @@ def practice_page(request, passage_id):
         'session': session,
         'user_answers': json.dumps(user_answers),
         'time_left': time_left,
+        'is_exam': is_exam,
+
     }
 
     return render(request, 'team14/Practice_Page.html', context)
@@ -346,21 +361,25 @@ def practice_result(request, session_id):
 
 @login_required
 def start_exam(request):
-    # فقط passage هایی که سوال دارند
-    passages = Passage.objects.annotate(
-        q_count=Count('questions')
-    ).filter(q_count__gt=0)
-
+    # ✅ انتخاب تصادفی passage
+    passages = Passage.objects.prefetch_related('questions__options').all()
     if not passages.exists():
-        return redirect('Exam_Page')
+        return redirect('index')
 
     passage = random.choice(list(passages))
 
+    # ✅ مدت زمان ETS (3 یا 4 passage)
+    passage_count = 3  # فعلاً ثابت، بعداً می‌تونی random یا تنظیمی کنی
+    exam_duration = 54 * 60 if passage_count == 3 else 72 * 60
+
+    # ✅ ساخت session آزمون
     session = UserSession.objects.create(
-        user_id=str(request.user.id),  # ✅ خیلی مهم
+        user_id=str(request.user.id),
         passage=passage,
         mode='exam',
-        start_time=timezone.now()
+        start_time=timezone.now(),
+        exam_duration=exam_duration
     )
 
+    # ✅ رفتن به Practice_Page (reuse)
     return redirect('practice_page', passage_id=passage.id)

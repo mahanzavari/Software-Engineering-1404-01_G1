@@ -19,4 +19,5 @@ urlpatterns = [
     path("practice/result/<int:session_id>/", views.practice_result, name="practice_result"),
     path('exam/start/', views.start_exam, name='start_exam'),
 
+
 ]
