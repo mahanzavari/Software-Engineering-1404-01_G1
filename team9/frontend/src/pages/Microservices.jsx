@@ -102,16 +102,14 @@ export default function Microservices() {
   return (
     <div className="t9-page" dir="rtl" lang="fa">
       <header className="t9-topbar">
-        <button className="t9-pillBtn">حساب کاربری</button>
-        <h1 className="t9-title">یادگیری مستمر با Tick 8</h1>
         <button className="t9-pillBtn">خانه</button>
+        <h1 className="t9-title">یادگیری مستمر با Tick 8</h1>
+        <button className="t9-pillBtn">حساب کاربری</button>
       </header>
 
-      <section className="t9-panel">
+      <section className="t9-mainpanel">
         <div className="t9-searchRow">
-          <span className="t9-searchIcon" aria-hidden="true">
-            🔍
-          </span>
+            <img className="t9-searchIcon" src="src\assets\team9\images\Icon.png"></img>
           <input
             className="t9-search"
             value={q}

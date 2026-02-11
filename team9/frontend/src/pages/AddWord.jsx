@@ -51,17 +51,15 @@ export default function AddWord() {
   return (
     <div className="t9-page" dir="rtl" lang="fa">
       <header className="t9-topbar">
-        <button className="t9-pillBtn">حساب کاربری</button>
+        <button className="t9-pillBtn" onClick={() => navigate("/microservices")}>خانه</button>
         <h1 className="t9-title">یادگیری مستمر با Tick 8</h1>
-        <button className="t9-pillBtn" onClick={() => navigate("/microservices")}>
-          خانه
-        </button>
+        <button className="t9-pillBtn">حساب کاربری</button>
       </header>
 
       <section className="t9-panel t9-addword">
         <div className="t9-form">
           <label className="t9-label">
-            <span>Enter Word:</span>
+            <span>واژه را وارد کنید:</span>
             <input
               className="t9-input"
               value={word}
@@ -78,9 +76,10 @@ export default function AddWord() {
             />
           </label>
 
-          <div className="t9-label">
+          <label className="t9-label">
             <span>انتخاب درس مورد نظر:</span>
-          </div>
+            <div className="t9-line"></div>
+          </label>
 
           <div className="t9-lessonBox">
             {lessons.map((l) => (
@@ -96,16 +95,12 @@ export default function AddWord() {
           </div>
 
           <div className="t9-addwordActions">
+            <button className="t9-actionBtn" type="button" onClick={handleAddWord}>
+              افزودن واژه
+            </button>
+            
             <button className="t9-actionBtn" type="button" onClick={() => navigate(-1)}>
               بازگشت
-            </button>
-
-            <button
-              className="t9-actionBtn"
-              type="button"
-              onClick={handleAddWord}
-            >
-              افزودن واژه
             </button>
           </div>
         </div>
