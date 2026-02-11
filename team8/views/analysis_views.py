@@ -53,7 +53,7 @@ def api_perform_analysis(request):
     try:
         completion = client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
             response_format={"type": "json_object"}
         )
         ai_response = json.loads(completion.choices[0].message.content)
