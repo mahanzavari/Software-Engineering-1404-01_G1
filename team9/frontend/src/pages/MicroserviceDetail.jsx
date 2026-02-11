@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import config from "../config";
 
 export default function MicroserviceDetail() {
   const { id } = useParams();
@@ -7,7 +8,7 @@ export default function MicroserviceDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/team9/api/lessons/${id}/`)
+    fetch(`${config.API_BASE_URL}/team9/api/lessons/${id}/`)
       .then((res) => res.json())
       .then((data) => {
         setItem(data);

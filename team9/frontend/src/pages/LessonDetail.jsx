@@ -9,6 +9,7 @@ export default function LessonDetail() {
   const [lesson, setLesson] = useState(null);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetch(`${config.API_BASE_URL}/team9/api/lessons/${id}/`)
@@ -45,6 +46,13 @@ export default function LessonDetail() {
 
   const total = rows.length;
   const progressPct = lesson?.progress_percent ? Math.round(lesson.progress_percent) : 0;
+
+  // Filter words based on search query
+  const filteredRows = rows.filter((r) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return r.en.toLowerCase().includes(query) || r.fa.includes(query);
+  });
 
   const mark = (rowId, type) => {
     const today = new Date().toISOString().split('T')[0];
@@ -99,7 +107,7 @@ export default function LessonDetail() {
       );
       
       // Refresh lesson to get updated progress_percent
-      fetch(`http://127.0.0.1:8000/team9/api/lessons/${id}/`)
+      fetch(`${config.API_BASE_URL}/team9/api/lessons/${id}/`)
         .then((res) => res.json())
         .then((data) => setLesson(data));
     })
@@ -130,8 +138,20 @@ export default function LessonDetail() {
           <div>پیشرفت: %{progressPct}</div>
         </div>
 
+        <div className="t9-searchRow" style={{ marginBottom: '16px' }}>
+          <span className="t9-searchIcon" aria-hidden="true">
+            🔍
+          </span>
+          <input
+            className="t9-search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="جستجوی کلمه (انگلیسی یا فارسی)"
+          />
+        </div>
+
         <div className="t9-wordsBox">
-          {rows.map((r) => (
+          {filteredRows.map((r) => (
             <div className="t9-wordRow" key={r.id}>
               <div className="t9-wordEn">{r.en}</div>
               <div className="t9-wordActions">
