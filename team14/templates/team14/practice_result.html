@@ -98,6 +98,19 @@
             ✅ شما <span>{{ correct_count }}</span> پاسخ صحیح از
             <span>{{ total_questions }}</span> سؤال داشتید
         </div>
+        {% if is_exam %}
+        <div class="exam-score-box">
+            <div class="exam-score-title">
+                🎯 نتیجه
+            </div>
+            <div class="exam-score-value">
+                {{ exam_percent }}%
+            </div>
+            <div class="exam-score-sub">
+                درصد پاسخ‌های صحیح
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Answer Sheet -->

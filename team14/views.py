@@ -18,7 +18,7 @@ from .models import UserSession, Question, Option, UserAnswer  # این خط ت�
 
 TEAM_NAME = "team14"
 
-
+PRACTICE_TIME_MINUTES = 30
 @api_login_required
 def ping(request):
     return JsonResponse({"team": TEAM_NAME, "ok": True})
@@ -172,7 +172,6 @@ def practice_page(request, passage_id):
 
     questions_qs = passage.questions.all().order_by('id')
 
-    # ✅ JSON برای JS
     questions_data = []
     for q in questions_qs:
         questions_data.append({
@@ -185,39 +184,32 @@ def practice_page(request, passage_id):
             ]
         })
 
-    # ✅ استفاده درست از user_id
-    # در اینجا باید از request.user استفاده کنید نه از request.user.id
-    # چون UserSession دارای ForeignKey به User است، بهتر است نمونه User را پاس دهید.
-    # اگر user_id در مدل UserSession به صورت CharField با max_length=36 ذخیره می‌شود،
-    # و شما قصد دارید شناسه کاربر را به صورت رشته‌ای ذخیره کنید، پس استفاده از request.user.id صحیح است.
-    # اما اگر ForeignKey به مدل User است، باید خود شیء User را پاس دهید.
-    # با توجه به تعریف UserSession که user_id: models.CharField است، request.user.id درست است.
-    session = UserSession.objects.filter(
-        user_id=str(request.user.id),
+    # ✅ بستن session های تمام نشده قبلی
+    UserSession.objects.filter(
+        user_id=request.user.id,
         passage=passage,
+        mode='practice',
         end_time__isnull=True
-    ).order_by('-start_time').first()
+    ).update(
+        end_time=timezone.now(),
+        total_score=0
+    )
 
-    if not session:
-        session = UserSession.objects.create(
-            user_id=str(request.user.id),
-            passage=passage,
-            mode='practice',
-            start_time=timezone.now()
-        )
+    # ✅ ساخت session جدید
+    session = UserSession.objects.create(
+        user_id=request.user.id,
+        passage=passage,
+        mode='practice',
+        start_time=timezone.now()
+    )
 
     user_answers = {
         ans.question_id: ans.selected_option_id
         for ans in UserAnswer.objects.filter(session=session)
     }
-    is_exam = session.mode == 'exam'
-    elapsed = (timezone.now() - session.start_time).total_seconds()
 
-
-    if is_exam:
-        time_left = max(0, session.exam_duration - elapsed)
-    else:
-        time_left = max(0, 18 * 60 - elapsed)
+    # ✅ زمان کامل تمرین
+    time_left = PRACTICE_TIME_MINUTES * 60
 
     context = {
         'passage': passage,
@@ -226,11 +218,10 @@ def practice_page(request, passage_id):
         'session': session,
         'user_answers': json.dumps(user_answers),
         'time_left': time_left,
-        'is_exam': is_exam,
-
     }
 
     return render(request, 'team14/Practice_Page.html', context)
+
 
 
 @csrf_exempt
@@ -246,6 +237,15 @@ def submit_answer(request):
             id=data['session_id'],
             user_id=str(request.user.id)
         )
+
+        # ✅ بررسی زمان
+        if session.start_time:
+            elapsed = (timezone.now() - session.start_time).total_seconds()
+            if elapsed > PRACTICE_TIME_MINUTES * 60:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'زمان تمرین به پایان رسیده است'
+                }, status=400)
 
         question = get_object_or_404(
             Question,
