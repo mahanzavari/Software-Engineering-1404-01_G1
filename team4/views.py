@@ -74,7 +74,7 @@ class StartPrivateChatAPIView(APIView):
 
     def post(self, request):
         target_user_id = request.data.get('user_id')
-        if not target_user_id:
+        if not target_user_id: 
             return Response({"error": "Target user_id required"}, status=status.HTTP_400_BAD_REQUEST)
         
         user1 = request.user
