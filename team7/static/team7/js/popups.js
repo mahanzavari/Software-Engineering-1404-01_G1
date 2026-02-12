@@ -384,14 +384,19 @@ function showExamResultPopupWithDetails(resultData) {
     // Get answered questions count
     const answeredCount = resultData.answeredQuestions || 0;
     const totalQuestions = resultData.totalQuestions || 0;
+    const maxScore = resultData.totalScore || 5; // Default to 5 if not provided
+    
+    console.log('showExamResultPopupWithDetails - maxScore:', maxScore, 'resultData.totalScore:', resultData.totalScore);
 
     // Determine score badge color based on score
     let scoreBadgeGradient = 'linear-gradient(135deg, #4caf50 0%, #81c784 100%)'; // Green - Excellent
     let scoreIcon = '★';
-    if (resultData.score < 5) {
+    // Calculate percentage of max score
+    const scorePercentage = (resultData.score / maxScore) * 100;
+    if (scorePercentage < 50) {
         scoreBadgeGradient = 'linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%)'; // Red - Poor
         scoreIcon = '!';
-    } else if (resultData.score < 6.5) {
+    } else if (scorePercentage < 75) {
         scoreBadgeGradient = 'linear-gradient(135deg, #ffb02d 0%, #ffc966 100%)'; // Orange - Fair
         scoreIcon = '◐';
     }
@@ -399,6 +404,9 @@ function showExamResultPopupWithDetails(resultData) {
     // Build per-question details HTML
     let questionsDetailsHTML = '';
     if (resultData.evaluations && resultData.evaluations.length > 0) {
+        // Determine max score based on result data (usually 5 for writing, 4 for speaking)
+        const maxScore = resultData.totalScore || 5.0;
+        
         questionsDetailsHTML = `
             <div class="detailed-results" style="margin-top: 32px; max-height: 400px; overflow-y: auto;">
                 <p style="font-weight: 600; color: #0b0754; margin-bottom: 16px; font-size: 14px;">تفاصیل نمرات:</p>
@@ -406,7 +414,7 @@ function showExamResultPopupWithDetails(resultData) {
         
         resultData.evaluations.forEach((eval_item) => {
             const qScore = eval_item.score || 0;
-            const qScorePercent = ((qScore / 5) * 100).toFixed(0);
+            const qScorePercent = ((qScore / maxScore) * 100).toFixed(0);
             let qScoreColor = '#ff6b6b'; // Red
             if (qScore >= 4) {
                 qScoreColor = '#4caf50'; // Green
@@ -418,7 +426,7 @@ function showExamResultPopupWithDetails(resultData) {
                 <div style="background: #f8f8fc; border-right: 4px solid ${qScoreColor}; padding: 12px; margin-bottom: 12px; border-radius: 4px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <span style="font-weight: 600; color: #0b0754;">سوال ${eval_item.questionIndex}</span>
-                        <span style="background: ${qScoreColor}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${qScore.toFixed(1)}/${maxScore}</span>
+                        <span style="background: ${qScoreColor}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${qScore.toFixed(1)}/${maxScore.toFixed(1)}</span>
                     </div>
                     <p style="font-size: 12px; color: #4a4a6a; line-height: 1.5; margin-bottom: 8px;">${eval_item.feedback || 'بازخورد در دسترس نیست'}</p>
             `;

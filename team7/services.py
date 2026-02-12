@@ -19,7 +19,7 @@ class WritingEvaluator:
 
     RUBRIC_VERSION = "ETS_iBT_2024_v1"
     MIN_WORDS = 50
-    MAX_WORDS = 150
+    MAX_WORDS = 1000
 
     def __init__(self):
         """Initialize LLM client from Django settings."""
