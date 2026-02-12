@@ -65,18 +65,37 @@
         <p id="storyText" class="story-text">Creating a story to help you remember...</p>
     </div>
 </div>
+
+<div class="gen-header">
+    <div class="gen-info">
+        <div class="icon-light">💡</div>
+        <div style="text-align: left; direction: ltr;">
+            <strong style="display: block; font-size: 16px;">AI Mnemonic Generator</strong>
+            <span style="font-size: 12px; color: #888;">for: <span id="current-word-display"></span></span>
+        </div>
+    </div>
+    <button class="btn-orange" id="genBtn" onclick="fetchMnemonic(getUrlParameter('word'))">Generate New</button>
+</div>
+
+
 {% endblock %}
 
 {% block scripts %}
 <script>
-    async function fetchMnemonic() {
+    // Get word from URL query parameter
+    function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    async function fetchMnemonic(word) {
         const btn = document.getElementById('genBtn');
         const wordTitle = document.getElementById('wordTitle');
         btn.innerText = "Processing...";
         btn.disabled = true;
 
         try {
-            const response = await fetch('/team8/api/get-mnemonic/');
+            const response = await fetch(`/team8/api/get-mnemonic/?word=${encodeURIComponent(word)}`);
             const data = await response.json();
             if (data.word) updateUI(data);
         } catch (error) {
@@ -96,7 +115,12 @@
         document.getElementById('mnemonicsImg').src = data.image_url;
         document.getElementById('mnemonicsDesc').innerText = data.mnemonic_text;
         document.getElementById('storyText').innerText = data.story_text;
+        document.getElementById('current-word-display').innerText = data.word;
     }
-    window.onload = fetchMnemonic;
+
+    window.onload = function() {
+        const word = getUrlParameter('word') || 'cat'; // fallback to 'cat'
+        fetchMnemonic(word);
+    };
 </script>
 {% endblock %}
