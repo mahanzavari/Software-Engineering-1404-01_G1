@@ -6,3 +6,4 @@ mysqlclient
 PyMySQL
 gunicorn
 whitenoise
+-r team1/requirements.txt
