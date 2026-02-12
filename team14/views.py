@@ -174,7 +174,6 @@ def practice_page(request, passage_id):
 
     questions_qs = passage.questions.all().order_by('id')
 
-    # ✅ JSON برای JS
     questions_data = []
     for q in questions_qs:
         questions_data.append({
@@ -202,7 +201,7 @@ def practice_page(request, passage_id):
     session = UserSession.objects.create(
         user_id=request.user.id,
         passage=passage,
-        mode='practice',
+        mode='practice',  # ✅ حتماً practice
         start_time=timezone.now()
     )
 
@@ -211,7 +210,6 @@ def practice_page(request, passage_id):
         for ans in UserAnswer.objects.filter(session=session)
     }
 
-    # ✅ زمان کامل تمرین
     time_left = PRACTICE_TIME_MINUTES * 60
 
     context = {
@@ -221,9 +219,11 @@ def practice_page(request, passage_id):
         'session': session,
         'user_answers': json.dumps(user_answers),
         'time_left': time_left,
+        'IS_EXAM': False,  # ✅ اضافه شد
     }
 
     return render(request, 'team14/Practice_Page.html', context)
+
 
 
 
@@ -364,28 +364,176 @@ def practice_result(request, session_id):
 
 @login_required
 def start_exam(request):
-    # ✅ انتخاب تصادفی passage
     passages = Passage.objects.prefetch_related('questions__options').all()
+    IS_EXAM = True
     if not passages.exists():
         return redirect('index')
 
     passage = random.choice(list(passages))
 
-    # ✅ مدت زمان ETS (3 یا 4 passage)
-    passage_count = 3  # فعلاً ثابت، بعداً می‌تونی random یا تنظیمی کنی
-    exam_duration = 54 * 60 if passage_count == 3 else 72 * 60
+    passage_count = 3
+    exam_duration = 30 * 60
 
     # ✅ ساخت session آزمون
     session = UserSession.objects.create(
         user_id=str(request.user.id),
         passage=passage,
-        mode='exam',
+        mode='exam',  # ✅ حتماً exam
         start_time=timezone.now(),
         exam_duration=exam_duration
     )
 
-    # ✅ رفتن به Practice_Page (reuse)
-    return redirect('practice_page', passage_id=passage.id)
+    questions_qs = passage.questions.all().order_by('id')
+
+    questions_data = []
+    for q in questions_qs:
+        questions_data.append({
+            "id": q.id,
+            "question_text": q.question_text,
+            "question_type": q.question_type,
+            "options": [
+                {"id": opt.id, "text": opt.text}
+                for opt in q.options.all()
+            ]
+        })
+
+    user_answers = {
+        ans.question_id: ans.selected_option_id
+        for ans in UserAnswer.objects.filter(session=session)
+    }
+
+    context = {
+        'passage': passage,
+        'questions': json.dumps(questions_data),
+        'total_questions': questions_qs.count(),
+        'session': session,
+        'user_answers': json.dumps(user_answers),
+        'time_left': exam_duration,
+        'IS_EXAM': True,  # ✅ اضافه شد
+    }
+
+    return render(request, 'team14/exam.html', context)
+
+
+@login_required(login_url='/auth/')
+def exam_result(request, session_id):
+    session = get_object_or_404(
+        UserSession,
+        id=session_id,
+        user_id=str(request.user.id)
+    )
+
+    questions = Question.objects.filter(
+        passage=session.passage
+    ).prefetch_related('options')
+
+    answers = {
+        ua.question_id: ua.selected_option_id
+        for ua in UserAnswer.objects.filter(session=session)
+    }
+
+    result_data = []
+    correct_count = 0
+    total_questions = questions.count()
+
+    for q in questions:
+        correct_option = q.options.filter(is_correct=True).first()
+        user_option_id = answers.get(q.id)
+
+        is_correct = user_option_id == (correct_option.id if correct_option else None)
+        if is_correct:
+            correct_count += 1
+
+        result_data.append({
+            "question_id": q.id,
+            "question_text": q.question_text,
+            "correct_option": correct_option.text if correct_option else "—",
+            "user_option": (
+                q.options.get(id=user_option_id).text
+                if user_option_id and q.options.filter(id=user_option_id).exists()
+                else "بدون پاسخ"
+            ),
+            "is_correct": is_correct
+        })
+
+    # محاسبه نمره از 30
+    score_out_of_30 = (correct_count / total_questions) * 30 if total_questions > 0 else 0
+    percentage = (correct_count / total_questions) * 100 if total_questions > 0 else 0
+
+    # ارزیابی براساس نمره
+    if score_out_of_30 >= 20:
+        evaluation_class = "evaluation-excellent"
+        evaluation_title = "🎉 عالی!"
+        evaluation_message = "شما در این آزمون عملکرد فوق‌العاده‌ای داشتید. مهارت خواندن شما در سطح بسیار خوبی است."
+    elif score_out_of_30 >= 10:
+        evaluation_class = "evaluation-good"
+        evaluation_title = "👍 خوب"
+        evaluation_message = "عملکرد خوبی داشتید. با تمرین بیشتر می‌توانید به نتایج بهتری برسید."
+    else:
+        evaluation_class = "evaluation-fair"
+        evaluation_title = "💪 نیاز به تمرین"
+        evaluation_message = "نگران نباشید! با تمرین مستمر و مطالعه بیشتر، مهارت شما بهبود خواهد یافت."
+
+    # محاسبه مدت زمان
+    if session.end_time and session.start_time:
+        duration_seconds = (session.end_time - session.start_time).total_seconds()
+        minutes = int(duration_seconds // 60)
+        seconds = int(duration_seconds % 60)
+        duration = f"{minutes}:{seconds:02d}"
+    else:
+        duration = "—"
+
+    # ذخیره نمره در session
+    session.total_score = score_out_of_30
+    session.save()
+    wrong_count = total_questions - correct_count
+    return render(request, "team14/exam_result.html", {
+        "session": session,
+        "total_questions": total_questions,
+        "correct_count": correct_count,
+        "results": result_data,
+        "level": session.passage.get_difficulty_level_display(),
+        "percentage": percentage,
+        "evaluation_class": evaluation_class,
+        "evaluation_title": evaluation_title,
+        "evaluation_message": evaluation_message,
+        "duration": duration,
+        "wrong_count": wrong_count,
+
+    })
+
+
+def finish_exam(request, session_id):
+    session = get_object_or_404(
+        UserSession,
+        id=session_id,
+        user_id=str(request.user.id),
+        mode='exam'  # ✅ فقط آزمون
+    )
+
+    answers = UserAnswer.objects.filter(session=session)
+    correct_count = 0
+
+    for answer in answers:
+        if answer.selected_option and answer.selected_option.is_correct:
+            correct_count += 1
+            answer.is_correct = True
+        else:
+            answer.is_correct = False
+        answer.save()
+
+    total_questions = session.passage.questions.count()
+
+    if session.end_time is None:
+        if total_questions > 0:
+            # نمره از 30
+            session.total_score = (correct_count / total_questions) * 30
+        else:
+            session.total_score = 0
+        session.end_time = timezone.now()
+        session.save()
+
+    return redirect('exam_result', session_id=session.id)
 
 def about(request):
     return None
