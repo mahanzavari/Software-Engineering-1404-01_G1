@@ -19,7 +19,7 @@ def get_user(token_key):
         return AnonymousUser()
 
 class JWTAuthMiddleware:
-    """
+    """  
     Custom middleware that takes a token from the query string and authenticates a user
     """
     def __init__(self, inner):
