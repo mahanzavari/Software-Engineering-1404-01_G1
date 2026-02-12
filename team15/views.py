@@ -659,7 +659,7 @@ def _exam_result_context(user, request):
     correct = sum(1 for a in answers if a.is_correct)
     total = len(answers)
     accuracy_float = calculate_accuracy(correct, total)
-    accuracy = int(round(accuracy_float))
+    accuracy = max(0, min(100, int(round(accuracy_float))))
     total_time = attempt.total_time or 0
     answer_time_values = [int(a.time_spent) for a in answers if a.time_spent and a.time_spent > 0]
     if answer_time_values:
@@ -706,7 +706,7 @@ def _exam_result_context(user, request):
         "result_avg_time": _format_mmss(avg_time),
         "result_skill_rows": result_skill_rows,
         "result_answer_rows": result_answer_rows,
-        "result_accuracy_dasharray": f"{accuracy}, 100",
+        "result_accuracy_dasharray": "100",
         "result_accuracy_dashoffset": max(0, 100 - accuracy),
     }
 

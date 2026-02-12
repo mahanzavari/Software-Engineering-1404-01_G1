@@ -159,10 +159,10 @@
                   <div class="relative size-40">
                     <svg class="size-full" height="36" viewBox="0 0 36 36" width="36"
                       xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="18" cy="18" fill="transparent" r="15.91549430918954" stroke="#e6e6e6"
+                      <circle cx="18" cy="18" fill="transparent" r="15.91549430918954" stroke="#e6e6e6" pathLength="100"
                         stroke-width="3"></circle>
-                      <circle cx="18" cy="18" fill="transparent" r="15.91549430918954" stroke="var(--primary-500)"
-                        stroke-dasharray="{{ result_accuracy_dasharray }}" stroke-dashoffset="{{ result_accuracy_dashoffset }}" stroke-width="3"></circle>
+                      <circle cx="18" cy="18" fill="transparent" r="15.91549430918954" stroke="var(--primary-500)" pathLength="100"
+                        stroke-dasharray="{{ result_accuracy_dasharray }}" stroke-dashoffset="{{ result_accuracy_dashoffset }}" stroke-width="3" transform="rotate(-90 18 18)"></circle>
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
                       <p class="text-4xl font-bold text-primary-500">{{ result_accuracy }}%</p>
