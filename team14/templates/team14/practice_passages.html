@@ -717,13 +717,13 @@
         }
 
         .count-badge {
-            background: linear-gradient(135deg, #FFB02D, #FFBD2E);
+            background: linear-gradient(135deg, #fd7563, #fd7563);
             color: white;
             padding: 12px 24px;
             border-radius: 15px;
             font-weight: 800;
             font-size: 17px;
-            box-shadow: 0 6px 20px rgba(255, 176, 45, 0.35);
+            box-shadow: 0 6px 20px rgb(255, 0, 0);
             animation: badge-pulse 2s ease-in-out infinite;
             display: flex;
             align-items: center;
@@ -731,8 +731,8 @@
         }
 
         @keyframes badge-pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(255, 176, 45, 0.35); }
-            50% { transform: scale(1.05); box-shadow: 0 8px 25px rgba(255, 176, 45, 0.45); }
+            0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgb(253, 117, 99); }
+            50% { transform: scale(1.05); box-shadow: 0 8px 25px rgb(0, 0, 0); }
         }
 
         .difficulty-badge {
@@ -1155,9 +1155,7 @@
                             <span class="meta-icon">⏱️</span>
                             <span>{{ passage.estimated_time }} دقیقه</span>
                         </div>
-                        <div class="difficulty-badge difficulty-{{ difficulty_level }}">
-                            سطح {{ difficulty_persian }}
-                        </div>
+
                     </div>
 
                     <p class="card-description">
