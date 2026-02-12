@@ -33,7 +33,7 @@ class Command(BaseCommand):
                         'title': 'Task 1: Formal Letter',
                         'prompt_text': 'You want to apply for a scholarship at an international university. Write a formal letter to request more information about the scholarship programs.',
                         'requirements': [
-                            'Write at least 150 words',
+                            'Write 50-150 words',
                             'Start the letter with proper greeting and salutation',
                             'Clearly state your purpose',
                             'End the letter with respectful closing'
@@ -49,7 +49,7 @@ class Command(BaseCommand):
                         'title': 'Task 2: Complaint Letter',
                         'prompt_text': 'You recently purchased a product online but it arrived defective. Write a formal letter to the seller, describe the problem, and request a replacement or refund.',
                         'requirements': [
-                            'Write at least 180 words',
+                            'Write 50-150 words',
                             'Explain the problem in detail',
                             'Suggest an appropriate solution',
                             'End the letter formally'
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                         'title': 'Task 1: Academic Text Analysis',
                         'prompt_text': 'Recent research shows that artificial intelligence technology has a profound impact on the education system. This technology has not only changed teaching methods but also transformed how students learn. On one hand, the use of smart educational systems has made personalized learning possible. On the other hand, increased dependence on technology can affect students\' social skills.',
                         'requirements': [
-                            'Write at least 200 words',
+                            'Write 50-150 words',
                             'Identify the main idea',
                             'Examine evidence and sources',
                             'Provide logical conclusion'
@@ -97,7 +97,7 @@ class Command(BaseCommand):
                         'title': 'Task 1: Write an Improvement Proposal',
                         'prompt_text': 'You work in a company. The company\'s time management system is very outdated and causes many problems for employees. Write a proposal for improving this system.',
                         'requirements': [
-                            'Write at least 150 words',
+                            'Write 50-150 words',
                             'Describe the current problems',
                             'Propose a detailed solution',
                             'Explain the benefits of your proposal'
@@ -113,7 +113,7 @@ class Command(BaseCommand):
                         'title': 'Task 2: Letter of Recommendation',
                         'prompt_text': 'Your friend has applied for a job at a prestigious company. You have been asked to write a letter of recommendation for them. In this letter, describe their abilities and positive qualities.',
                         'requirements': [
-                            'Write at least 180 words',
+                            'Write 50-150 words',
                             'Discuss your friend\'s qualities and abilities',
                             'Provide specific examples of their work',
                             'End the letter with a strong recommendation'
@@ -137,7 +137,7 @@ class Command(BaseCommand):
                         'title': 'Task 1: Defend a Claim',
                         'prompt_text': 'Do you believe that online education is as effective as in-person education? State your opinion.',
                         'requirements': [
-                            'Write at least 200 words',
+                            'Write 50-150 words',
                             'Clearly state your opinion',
                             'Provide at least three reasons to support your opinion',
                             'Address potential objections'
@@ -153,7 +153,7 @@ class Command(BaseCommand):
                         'title': 'Task 2: Compare Two Solutions',
                         'prompt_text': 'To reduce city traffic, two solutions exist: 1) Increase and improve public transportation, 2) Restrict private cars from entering the city center. Which solution is better?',
                         'requirements': [
-                            'Write at least 210 words',
+                            'Write 50-150 words',
                             'Analyze both solutions',
                             'Compare advantages and disadvantages',
                             'Justify your choice'

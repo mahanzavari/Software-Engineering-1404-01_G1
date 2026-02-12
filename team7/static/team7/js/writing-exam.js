@@ -291,8 +291,8 @@ function updateProgress() {
     const text = textarea.value.trim();
     const words = text.split(/\s+/).filter(word => word.length > 0).length;
     
-    // Calculate progress based on typical minimum word count (250 words)
-    const targetWords = 250;
+    // Calculate progress based on maximum word count (150 words)
+    const targetWords = 150;
     const percentage = Math.min(100, Math.round((words / targetWords) * 100));
 
     progressElement.textContent = percentage + '%';
@@ -408,73 +408,186 @@ function updateNavigationButtons() {
 
 // ==================== EXAM SUBMISSION ====================
 /**
- * Save draft answers
+ * Check if all questions have been answered with minimum word count
+ * @returns {Object} {isValid: boolean, message: string}
  */
-function saveDraft() {
+function validateAllAnswers() {
+    const MIN_WORDS = 150;
+    
+    for (let i = 0; i < examState.totalQuestions; i++) {
+        const question = examState.currentExam.questions[i];
+        const answer = examState.userAnswers[question.id] || '';
+        const wordCount = answer.trim().split(/\s+/).filter(word => word.length > 0).length;
+        
+        if (wordCount < MIN_WORDS) {
+            return {
+                isValid: false,
+                message: `سوال ${i + 1} دارای پاسخ ناکافی است. لطفاً حداقل ${MIN_WORDS} کلمه پاسخ دهید.`
+            };
+        }
+    }
+    
+    return {
+        isValid: true,
+        message: 'OK'
+    };
+}
+
+/**
+ * Submit exam - evaluate all questions via API
+ */
+async function submitExam() {
+    // Save current answer
     const textarea = document.getElementById('answerTextarea');
     const currentQuestion = examState.currentExam.questions[examState.currentQuestionIndex];
     examState.userAnswers[currentQuestion.id] = textarea.value;
 
-    // Visual feedback
-    const saveBtn = document.getElementById('saveBtn');
-    const originalText = saveBtn.textContent;
-    saveBtn.textContent = 'ذخیره شد ✓';
+    // Validate all answers
+    const validation = validateAllAnswers();
+    if (!validation.isValid) {
+        alert(validation.message);
+        return;
+    }
 
-    setTimeout(() => {
-        saveBtn.textContent = originalText;
-    }, 2000);
-
-    console.log('Draft saved:', examState.userAnswers);
-}
-
-/**
- * Submit exam
- */
-function submitExam() {
     // Show submit confirmation popup
-    showSubmitExamPopup(() => {
-        // Save current answer
-        const textarea = document.getElementById('answerTextarea');
-        const currentQuestion = examState.currentExam.questions[examState.currentQuestionIndex];
-        examState.userAnswers[currentQuestion.id] = textarea.value;
-
+    showSubmitExamPopup(async () => {
         // Stop timers
         clearInterval(examState.timerInterval);
         clearInterval(examState.timeElapsedInterval);
 
-        // Prepare submission data
-        const submissionData = {
-            examId: examState.currentExamId,
-            examTitle: examState.currentExam.title,
-            totalQuestions: examState.totalQuestions,
-            answers: examState.userAnswers,
-            submittedAt: new Date().toISOString(),
-            timeUsed: Math.floor((Date.now() - examState.startTime) / 1000)
-        };
+        // Show loading indicator
+        showLoadingPopup();
 
-        console.log('Submitting exam:', submissionData);
+        try {
+            const scores = [];
+            const evaluations = [];
 
-        // TODO: Send to API
-        // fetch('/api/submit-exam', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify(submissionData)
-        // }).then(response => response.json())
-        //   .then(data => {
-        //       // Handle response
-        //       window.location.href = '/exams/results/';
-        //   });
+            // Get user ID from authManager (ensure auth initialized)
+            if (!window.authManager) {
+                throw new Error('AuthManager not available');
+            }
 
-        // Show result popup
-        const resultData = {
-            score: 8.2,
-            totalScore: 10,
-            type: examState.currentExam.title,
-            message: 'عملکرد خوبی داشتید. برای بهبود بیشتر، نکات ضعیف خود را بررسی کنید.'
-        };
-        showExamResultPopup(resultData);
+            // Initialize auth manager if not yet initialized (same approach as in exam.js)
+            if (window.authManager.isInitialized && !window.authManager.isInitialized()) {
+                await window.authManager.initialize();
+            }
+
+            // Ensure we have up-to-date authentication/user info
+            const isAuthenticated = await window.authManager.checkAuthStatus();
+            if (!isAuthenticated) {
+                throw new Error('User not authenticated');
+            }
+
+            // Try to get current user; if missing, force a refresh
+            let currentUser = window.authManager.getCurrentUser();
+            if (!currentUser) {
+                console.warn('submitExam: currentUser missing, attempting to refresh user data');
+                if (typeof window.authManager.refreshUser === 'function') {
+                    await window.authManager.refreshUser();
+                    currentUser = window.authManager.getCurrentUser();
+                }
+            }
+
+            console.log('submitExam - currentUser:', currentUser);
+
+            // Accept multiple possible id field names used across services
+            const userId = currentUser && (currentUser.id || currentUser.user_id || currentUser.pk || currentUser.uuid || currentUser._id);
+            if (!userId) {
+                throw new Error('Unable to get current user ID');
+            }
+
+            // Evaluate each question via API
+            for (let i = 0; i < examState.totalQuestions; i++) {
+                const question = examState.currentExam.questions[i];
+                const answer = examState.userAnswers[question.id];
+
+                try {
+                    const response = await fetch('/team7/api/submit-writing/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            question_id: question.id,
+                            text: answer
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        // Handle specific error codes
+                        if (response.status === 503) {
+                            throw new Error('سرویس ارزیابی موقتاً در دسترس نیست. لطفاً دوباره تلاش کنید.');
+                        } else if (response.status === 400) {
+                            throw new Error(result.error || 'ورودی نامعتبر');
+                        } else {
+                            throw new Error(`خطای API: ${response.status}`);
+                        }
+                    }
+
+                    if (result.status === 'success') {
+                        scores.push(result.overall_score);
+                        evaluations.push({
+                            questionIndex: i + 1,
+                            score: result.overall_score,
+                            feedback: result.feedback,
+                            criteria: result.criteria
+                        });
+                        console.log(`Question ${i + 1} evaluated: ${result.overall_score}`);
+                    } else {
+                        throw new Error(result.error || 'Evaluation failed');
+                    }
+                } catch (error) {
+                    console.error(`Error evaluating question ${i + 1}:`, error);
+                    // On first error, close popup and show error message
+                    if (i === 0) {
+                        PopupManager.closePopup();
+                        alert(error.message || 'خطا در ارزیابی آزمون. لطفاً دوباره تلاش کنید.');
+                        return;
+                    }
+                    // Continue with other questions even if one fails
+                    evaluations.push({
+                        questionIndex: i + 1,
+                        score: 0,
+                        feedback: error.message || 'خطا در ارزیابی این سوال',
+                        criteria: []
+                    });
+                }
+            }
+
+            // Calculate average score
+            const averageScore = scores.length > 0
+                ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
+                : 0;
+
+            // Prepare result data
+            const timeUsed = Math.floor((Date.now() - examState.startTime) / 1000);
+            const resultData = {
+                score: parseFloat(averageScore),
+                totalScore: 5.0,
+                answeredQuestions: examState.totalQuestions,
+                totalQuestions: examState.totalQuestions,
+                timeSpent: timeUsed,
+                type: examState.currentExam.title,
+                message: 'از تلاش شما سپاسگزاریم. نتایج تفصیلی هر سوال را در زیر مشاهده کنید.',
+                evaluations: evaluations // Add per-question details
+            };
+
+            console.log('Result data:', resultData);
+
+            // Close loading popup and show result
+            PopupManager.closePopup();
+            setTimeout(() => {
+                showExamResultPopupWithDetails(resultData);
+            }, 300);
+
+        } catch (error) {
+            console.error('Error during exam submission:', error);
+            PopupManager.closePopup();
+            alert('خطا در ارسال آزمون. لطفاً دوباره تلاش کنید.');
+        }
     });
 }
 
@@ -504,15 +617,7 @@ function attachEventListeners() {
     }
 
     // Buttons
-    const saveBtn = document.getElementById('saveBtn');
     const submitBtn = document.getElementById('submitBtn');
-    
-    if (saveBtn) {
-        saveBtn.addEventListener('click', saveDraft);
-        console.log('Save button listener attached');
-    } else {
-        console.error('Save button not found');
-    }
     
     if (submitBtn) {
         submitBtn.addEventListener('click', () => {

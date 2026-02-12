@@ -236,6 +236,39 @@ function showSubmitExamPopup(onConfirm) {
     }
 }
 
+// ==================== LOADING POPUP ====================
+/**
+ * Show loading popup with spinner
+ */
+function showLoadingPopup() {
+    const popup = document.createElement('div');
+    popup.className = 'popup-container';
+    
+    popup.innerHTML = `
+        <div class="popup-body" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 40px;">
+            <div class="loading-spinner-large" style="width: 80px; height: 80px; border: 4px solid #f3f3f3; border-top: 4px solid #0b0754; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px;"></div>
+            <p style="font-size: 18px; color: #0b0754; font-weight: 600; text-align: center;">درحال ارزیابی پاسخ‌های شما...</p>
+            <p style="font-size: 14px; color: #4a4a6a; text-align: center; margin-top: 12px;">لطفاً منتظر بمانید</p>
+        </div>
+    `;
+    
+    // Add spinner animation CSS
+    if (!document.getElementById('spinner-animation-css')) {
+        const style = document.createElement('style');
+        style.id = 'spinner-animation-css';
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Show popup as non-closeable
+    PopupManager.showPopup(popup, false);
+}
+
 // ==================== EXAM RESULT POPUP ====================
 /**
  * Show exam result popup
@@ -312,6 +345,154 @@ function showExamResultPopup(resultData) {
                         </div>
                     </div>
                 </div>
+
+                <p class="popup-result-text" style="margin-top: 32px; text-align: center; font-size: 14px; color: #4a4a6a;">
+                    ${resultData.message || 'برای مشاهده تحلیل دقیق‌تر و بازخورد تفصیلی، به صفحه آزمون‌ها بروید.'}
+                </p>
+                <p class="popup-result-text hint" style="margin-top: 16px;">
+                    💡 برای دیدن نتایج کامل و توصیات بهبود، بر روی دکمه زیر کلیک کنید.
+                </p>
+            </div>
+        </div>
+
+        <div class="popup-footer">
+            <button class="popup-button popup-button-primary" onclick="window.location.href='/team7/exams/';">
+                مشاهده تمام آزمون‌ها
+            </button>
+        </div>
+    `;
+
+    // Show popup as non-closeable (must click a button to close)
+    PopupManager.showPopup(popup, false);
+}
+
+// ==================== ENHANCED RESULT POPUP ====================
+/**
+ * Show exam result popup with per-question details
+ * @param {Object} resultData - Result information with evaluations array
+ */
+function showExamResultPopupWithDetails(resultData) {
+    const popup = document.createElement('div');
+    popup.className = 'popup-container';
+
+    // Format time spent
+    const totalSeconds = resultData.timeSpent || 0;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const timeString = `${minutes}:${String(seconds).padStart(2, '0')}`;
+
+    // Get answered questions count
+    const answeredCount = resultData.answeredQuestions || 0;
+    const totalQuestions = resultData.totalQuestions || 0;
+
+    // Determine score badge color based on score
+    let scoreBadgeGradient = 'linear-gradient(135deg, #4caf50 0%, #81c784 100%)'; // Green - Excellent
+    let scoreIcon = '★';
+    if (resultData.score < 5) {
+        scoreBadgeGradient = 'linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%)'; // Red - Poor
+        scoreIcon = '!';
+    } else if (resultData.score < 6.5) {
+        scoreBadgeGradient = 'linear-gradient(135deg, #ffb02d 0%, #ffc966 100%)'; // Orange - Fair
+        scoreIcon = '◐';
+    }
+
+    // Build per-question details HTML
+    let questionsDetailsHTML = '';
+    if (resultData.evaluations && resultData.evaluations.length > 0) {
+        questionsDetailsHTML = `
+            <div class="detailed-results" style="margin-top: 32px; max-height: 400px; overflow-y: auto;">
+                <p style="font-weight: 600; color: #0b0754; margin-bottom: 16px; font-size: 14px;">تفاصیل نمرات:</p>
+        `;
+        
+        resultData.evaluations.forEach((eval_item) => {
+            const qScore = eval_item.score || 0;
+            const qScorePercent = ((qScore / 5) * 100).toFixed(0);
+            let qScoreColor = '#ff6b6b'; // Red
+            if (qScore >= 4) {
+                qScoreColor = '#4caf50'; // Green
+            } else if (qScore >= 3) {
+                qScoreColor = '#ffb02d'; // Orange
+            }
+            
+            questionsDetailsHTML += `
+                <div style="background: #f8f8fc; border-right: 4px solid ${qScoreColor}; padding: 12px; margin-bottom: 12px; border-radius: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-weight: 600; color: #0b0754;">سوال ${eval_item.questionIndex}</span>
+                        <span style="background: ${qScoreColor}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${qScore.toFixed(1)}/5</span>
+                    </div>
+                    <p style="font-size: 12px; color: #4a4a6a; line-height: 1.5; margin-bottom: 8px;">${eval_item.feedback || 'بازخورد در دسترس نیست'}</p>
+            `;
+            
+            // Add criteria if available
+            if (eval_item.criteria && eval_item.criteria.length > 0) {
+                questionsDetailsHTML += `
+                    <div style="font-size: 11px; color: #666; margin-top: 8px;">
+                        <strong style="display: block; margin-bottom: 4px;">معیارها:</strong>
+                `;
+                eval_item.criteria.forEach((criterion) => {
+                    questionsDetailsHTML += `
+                        <div style="margin-bottom: 4px;">• <strong>${criterion.name}:</strong> ${criterion.score.toFixed(1)}/5 - ${criterion.comment || ''}</div>
+                    `;
+                });
+                questionsDetailsHTML += `
+                    </div>
+                `;
+            }
+            
+            questionsDetailsHTML += `</div>`;
+        });
+        
+        questionsDetailsHTML += `</div>`;
+    }
+
+    popup.innerHTML = `
+        <div class="popup-header">
+            <h2 class="popup-title">تبریک! آزمون تکمیل شد</h2>
+        </div>
+
+        <div class="popup-body">
+            <div class="popup-result-container">
+                <p class="popup-result-text" style="font-size: 16px; margin-bottom: 32px; color: #0b0754; text-align: center;">
+                    نتایج آزمون <strong>${resultData.type}</strong>
+                </p>
+
+                <!-- Three Result Badges -->
+                <div class="result-badges-grid">
+                    <!-- Badge 1: Answered Questions -->
+                    <div class="result-badge">
+                        <div class="result-badge-inner" style="background: linear-gradient(135deg, #3aa0ca 0%, #80caff 100%);">
+                            <div class="result-badge-icon">✓</div>
+                        </div>
+                        <div class="result-badge-content">
+                            <p class="result-badge-label">پاسخ‌های شما</p>
+                            <p class="result-badge-value">${answeredCount}/${totalQuestions}</p>
+                        </div>
+                    </div>
+
+                    <!-- Badge 2: Time Spent -->
+                    <div class="result-badge">
+                        <div class="result-badge-inner" style="background: linear-gradient(135deg, #fa0b67 0%, #ffb02d 100%);">
+                            <div class="result-badge-icon">⏱</div>
+                        </div>
+                        <div class="result-badge-content">
+                            <p class="result-badge-label">زمان سپری شده</p>
+                            <p class="result-badge-value">${timeString}</p>
+                        </div>
+                    </div>
+
+                    <!-- Badge 3: Score -->
+                    <div class="result-badge">
+                        <div class="result-badge-inner" style="background: ${scoreBadgeGradient};">
+                            <div class="result-badge-icon">${scoreIcon}</div>
+                        </div>
+                        <div class="result-badge-content">
+                            <p class="result-badge-label">نمره نهایی</p>
+                            <p class="result-badge-value">${resultData.score.toFixed(1)}/5</p>
+                        </div>
+                    </div>
+                </div>
+
+                ${questionsDetailsHTML}
 
                 <p class="popup-result-text" style="margin-top: 32px; text-align: center; font-size: 14px; color: #4a4a6a;">
                     ${resultData.message || 'برای مشاهده تحلیل دقیق‌تر و بازخورد تفصیلی، به صفحه آزمون‌ها بروید.'}
