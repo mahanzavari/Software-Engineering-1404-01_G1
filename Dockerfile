@@ -10,11 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/
+COPY --parents team*/requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Install team7 specific requirements for TOEFL AI evaluation
-COPY team7/requirements.txt /app/team7/requirements.txt
-RUN pip install --no-cache-dir -r /app/team7/requirements.txt
 
 COPY . /app/
 
